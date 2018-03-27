@@ -1,43 +1,59 @@
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Pop {
-    int port;
-    String host;
+public class Pop implements Runnable {
+	private int port;
+	private int poolingtime;
+    private String host;
+    private String user;
+    private String password;
     private Socket socket;
+    private boolean isWorking;
     private BufferedReader reader;
     private BufferedWriter writer;
-    public Pop(String hostName, String portNumber){
-        port = Integer.parseInt(portNumber);
+    private int lastMessageIndex;
+    private List<String> headers = new ArrayList<String>();
+    public Pop(String hostName, String portNumber, 
+    		String username, String _password,
+    		String _poolingtime){
+    	port = Integer.parseInt(portNumber);
+    	poolingtime = Integer.parseInt(_poolingtime);
         host = hostName;
+        user = username;
+        password = _password;
     }
     public void connect(){
+        isWorking = true;
+    	lastMessageIndex = 1;
         try {
             socket = new Socket();
             socket.connect(new InetSocketAddress(host, port));
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            System.out.println("Connected to the host");
-            //System.out.println(read());
+            System.out.println("Connecting to the " + host + ":"+ port + " " + read() + " " + login());
         } catch (IOException e) {
-            System.out.println("Error during connection");
+        	 System.out.println("Error during connection");
         }
     }
     public void disconnect(){
+    	isWorking = false;
+    	headers.clear();
         if (!(socket != null && socket.isConnected())){
-            System.out.println("Not connected");
-            return;
+        	System.out.println("Not connected");
         }
+    	String res = logout();
         try {
             socket.close();
         } catch (IOException e) {
         }
         reader = null;
         writer = null;
-        System.out.println("Disconnected from the host");
+        System.out.println("Disconnected from the host " + res);
     }
     private String send(String data){
-        System.out.println("Sending " + data);
+        //System.out.println("Sending " + data);
         try {
             writer.write(data + "\n");
             writer.flush();
@@ -47,54 +63,71 @@ public class Pop {
             return "";
         }
     }
-    private String read(){
-        String response = null;
+    /*
+    private String read(int size){
+    	int count=0;
+    	char[] buffer = new char[size];
         try {
-            response = reader.readLine();
+        	int c;
+        	while ((c = reader.read()) != -1 && count < size){
+        		buffer[count++]=(char)c;
+        	}      
+        } catch (IOException e) {
+            System.out.println("Cannot read");
+        }
+        String response = new String(buffer);
+        if (response.startsWith("-ERR")){
+            System.out.println("Server sent error "+response);
+        }
+        return response;
+    }
+    */
+    private String read(){
+        String response = "";
+        try {
+            response = reader.readLine();            
         } catch (IOException e) {
             System.out.println("Cannot readline");
             return "";
         }
         if (response.startsWith("-ERR")){
-            System.out.println("Server error");
+            System.out.println("Server sent error "+response);
         }
         return response;
     }
-    public void login(String username, String password){
-        send("USER " + username);
-        send("PASS " + password);
+    private String login(){
+        return send("USER " + user) + send("PASS " + password);   
     }
-    public void logout(){
-        send("QUIT");
+    private String logout(){
+        return send("QUIT");
     }
-    public int getNumberOfNewMessages(){
+    private int getNumberOfNewMessages(){
         String response = send("STAT");
         String[] values = response.split(" ");
         return Integer.parseInt(values[1]);
     }
-    public void getMessage(int index){
-        String response = send("RETR " + index);
-
-        String headerName = null;
-        while ((response = read()).length() != 0) {
-            if (response.startsWith("\t")) {
-                continue; //no process of multiline headers
+    private void getNewMessages(){
+    	int size = getNumberOfNewMessages();
+		String message = "";
+    	for (; lastMessageIndex<=size; lastMessageIndex++){
+    		send("RETR " + lastMessageIndex);
+        	while(!(message=read()).equals(".")){
+        		if (message.startsWith("Subject: ")){
+        			message = message.substring(9);
+        			if (!headers.contains(message)){
+        				headers.add(message);
+        				System.out.println(message);
+        			}
+        		}
+        	}
+    	}
+    }
+    public void run() {
+        try {
+        	while (isWorking){
+        		getNewMessages();
+            	Thread.sleep(poolingtime*1000);
             }
-            int colonPosition = response.indexOf(":");
-            headerName = response.substring(0, colonPosition);
-            String headerValue;
-            if (headerName.length() > colonPosition) {
-                headerValue = response.substring(colonPosition + 2);
-            } else {
-                headerValue = "";
-            }
-            System.out.println(headerName+" "+headerValue);
-        }
-
-        StringBuilder bodyBuilder = new StringBuilder();
-        while (!(response = read()).equals(".")) {
-            bodyBuilder.append(response + "\n");
-        }
-        System.out.println(bodyBuilder.toString());
+        } catch(InterruptedException v) {}
     }
 }
