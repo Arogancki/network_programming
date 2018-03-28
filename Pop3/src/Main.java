@@ -18,17 +18,22 @@ public class Main {
             return;
         }
         //System.out.println(config.keySet().toString());
-        Pop pop = new Pop(config.get("server") , config.get("port"), 
+        
+        Pop pop;
+        try {
+        	pop = new Pop(config.get("server") , config.get("port"), 
         		config.get("username"), config.get("password"), config.get("pooling"));
-        pop.connect();
-        System.out.println("Press 'q' to quit.\nChecking for messages...");
-        new Thread(pop).start();
+        }
+        catch (NumberFormatException e) {
+            System.out.println("App.config file error.");
+            return;
+        }
+        pop.start();
         Scanner scanner = new Scanner(System.in);
         char c;
         do{
         	c = scanner.next().charAt(0);
         }while(c!='q');
-        pop.disconnect();
-        System.out.println("Bye");    
+        pop.stop();  
     }
 }
