@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SITE url="detox.wi.ps.pl/" depth="3">
+<FILE href="/omni/index.html" >
+<IMAGE>icons/omni-header.gif</IMAGE>
+<IMAGE>icons/blueBall.gif</IMAGE>
+<IMAGE>icons/redBall.gif</IMAGE>
+<EMAIL>pdp-openmp@trc.rwcp.or.jp</EMAIL>
+</FILE>
+<FILE href="/sw/index.html" >
+<FILE href="/sw/pwjs/lab_01.html" >
+</FILE>
+<FILE href="/sw/pwjs/lab_02.html" >
+</FILE>
+<FILE href="/sw/pkg/zad1.html" >
+<IMAGE>http://upload.wikimedia.org/math/f/8/1/f811a4cb04f85f8dcdea97605ca82212.png</IMAGE>
+</FILE>
+<IMAGE>https://thecomicninja.files.wordpress.com/2012/05/dilbert-it-sells-itself.gif</IMAGE>
+</FILE>
+<FILE href="/db/index.html" >
+</FILE>
+<FILE href="/pb/index.html" >
+<FILE href="/pb/prace.html" >
+<IMAGE>http://www.w3.org/Icons/valid-xhtml10</IMAGE>
+</FILE>
+<IMAGE>http://www.w3.org/Icons/valid-xhtml10</IMAGE>
+</FILE>
+
+</SITE>
