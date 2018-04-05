@@ -174,7 +174,7 @@ public class Crawler{
     	    out.print(
     	    		header + "\n" + 
     	    		root + "\n" +
-    	    		content + "\n" + 
+    	    		content + 
     	    		rootEnd);
     	    out.flush();
     	    out.close();

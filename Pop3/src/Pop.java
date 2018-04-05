@@ -39,7 +39,7 @@ public class Pop implements Runnable {
 		} catch (FileNotFoundException e1) {
 		}
     }
-    private void connect() throws IOException{
+    private void connect() throws Exception, IOException{
     	socket = new Socket();
         socket.connect(new InetSocketAddress(host, port));
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -50,7 +50,7 @@ public class Pop implements Runnable {
     }
     private void disconnect() throws IOException{
         if (!(socket != null && socket.isConnected())){
-        	throw new Error("Not connected");
+        	throw new IOException("Not connected");
         }
     	String res = logout();
         socket.close();
@@ -67,7 +67,7 @@ public class Pop implements Runnable {
     private String read() throws IOException{
         String response = reader.readLine();
         if (response.startsWith("-ERR")){
-            throw new Error("Server sent error "+response);
+            throw new IOException("Server sent error "+response);
         }
         return response;
     }
@@ -129,13 +129,16 @@ public class Pop implements Runnable {
 					connect();
 					getNewMessages();
 					disconnect();
-				} catch (IOException e) {
-					System.out.println("Connection error.");
+				} catch (IOException e){
+					System.out.println(e.getMessage());
+					break;
 				}
             	Thread.sleep(poolingtime*1000);
             }
         } catch(InterruptedException v) {
         	System.out.println("Bye!");
+        } catch(Exception e){
+        	System.out.println(e.getMessage());
         }
         // save headers
         BufferedWriter fileWriter =null;

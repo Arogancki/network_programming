@@ -27,27 +27,31 @@ public class Main {
         	
         	Scanner scanner = new Scanner(System.in);
         	System.out.print("---------- FTPClient ----------\n" +
-        			"manual - .help\n\n" +
+        			"manual - help\n\n" +
         			"wd: "+fc.Get()+"\n");
             String userInput;
             do{
             	System.out.print("-------------------------------\n"+">");
             	userInput = scanner.next();
             	System.out.print("\n");
-            	if (userInput.equalsIgnoreCase(".quit")){
-            		break;
-            	}
-            	if (userInput.equalsIgnoreCase(".tree")){
-            		System.out.print(fc.GetTree()+"\n");
-            		userInput = fc.getCwd();
-            	}
-            	if (userInput.equalsIgnoreCase(".help")){
-            		System.out.println("help:\n" +
-            				"  .quit to exit \n" + 
-            				"  .tree to print tree view \n" +
-            				"  [path] to navigate \n");
-            		userInput = fc.getCwd();
-            	}
+				if (userInput.charAt(0)=='\\')
+					userInput = userInput.substring(1);
+				else{
+	            	if (userInput.equalsIgnoreCase("quit")){
+	            		break;
+	            	}
+	            	if (userInput.equalsIgnoreCase("tree")){
+	            		System.out.print(fc.GetTree()+"\n");
+	            		userInput = fc.getCwd();
+	            	}
+	            	if (userInput.equalsIgnoreCase("help")){
+	            		System.out.println("help:\n" +
+	            				"  quit to exit \n" + 
+	            				"  tree to print tree view \n" +
+	            				"  [path] to navigate \n");
+	            		userInput = fc.getCwd();
+	            	}
+				}
             	System.out.print("wd: "+fc.Get(userInput)+"\n");
             }while(true);
         }

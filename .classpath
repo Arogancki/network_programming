@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="base64old/src"/>
+	<classpathentry kind="src" path="Crawler/src"/>
+	<classpathentry kind="src" path="FTPclient/src"/>
+	<classpathentry kind="src" path="Pop3/src"/>
+	<classpathentry kind="src" path="SMTP/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="base64old/src"/>
+</classpath>
